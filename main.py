@@ -89,25 +89,36 @@ def login():
         username = request.form.get('username', '').strip()
         password = request.form.get('password', '').strip()
         
+        # Hata ayıklama satırları
+        print(f"Deneme: Kullanıcı adı -> {username}")
+        print(f"Deneme: Şifre -> {password}")
+        
         if not username or not password:
             error = 'Kullanıcı adı ve şifre boş bırakılamaz!'
         else:
             users = load_users()
             password_hash = hashlib.md5(password.encode()).hexdigest()
             
+            # Hata ayıklama: Girilen şifrenin MD5 hash'i
+            print(f"Girilen şifrenin MD5 hash'i: {password_hash}")
+            
             for user in users:
+                # Hata ayıklama: Veritabanındaki kullanıcı bilgileri
+                print(f"Veritabanı: Kullanıcı adı -> {user['username']}")
+                print(f"Veritabanı: Şifre (hash) -> {user['password']}")
+                
                 if user['username'] == username and user['password'] == password_hash:
                     session['user_id'] = user['id']
                     session['username'] = user['username']
                     session['full_name'] = f"{user['first_name']} {user['last_name']}"
                     session['is_admin'] = user['is_admin']
                     
-                    # GEÇİCİ HATA AYIKLAMA SATIRI:
-                    print("Giriş başarılı! Oturum oluşturuldu.")
+                    print("Giriş BAŞARILI!")
                     
                     return redirect(url_for('dashboard'))
             
             error = 'Kullanıcı adı veya şifre hatalı!'
+            print("Giriş BAŞARISIZ!")
     
     return render_template('login.html', error=error)
 
