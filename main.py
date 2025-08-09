@@ -13,7 +13,6 @@ USERS_FILE = os.path.join(DATA_DIR, "users.json")
 VISITORS_FILE = os.path.join(DATA_DIR, "visitors.json")
 
 # Veri dizinini oluştur
-# Bu kısım artık /tmp/data klasörünü oluşturur
 if not os.path.exists(DATA_DIR):
     os.makedirs(DATA_DIR, exist_ok=True)
 
@@ -102,6 +101,10 @@ def login():
                     session['username'] = user['username']
                     session['full_name'] = f"{user['first_name']} {user['last_name']}"
                     session['is_admin'] = user['is_admin']
+                    
+                    # GEÇİCİ HATA AYIKLAMA SATIRI:
+                    print("Giriş başarılı! Oturum oluşturuldu.")
+                    
                     return redirect(url_for('dashboard'))
             
             error = 'Kullanıcı adı veya şifre hatalı!'
