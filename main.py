@@ -13,6 +13,7 @@ USERS_FILE = os.path.join(DATA_DIR, "users.json")
 VISITORS_FILE = os.path.join(DATA_DIR, "visitors.json")
 
 # Veri dizinini oluştur
+# Bu kısım artık /tmp/data klasörünü oluşturur
 if not os.path.exists(DATA_DIR):
     os.makedirs(DATA_DIR, exist_ok=True)
 
