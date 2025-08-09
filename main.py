@@ -7,8 +7,8 @@ from flask import Flask, render_template, request, redirect, url_for, session, j
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "ziyaretci-takip-sistemi-secret-key")
 
-# Veri dizini
-DATA_DIR = "data"
+# Vercel'in yazma izni olan tek dizin: /tmp
+DATA_DIR = "/tmp/data"
 USERS_FILE = os.path.join(DATA_DIR, "users.json")
 VISITORS_FILE = os.path.join(DATA_DIR, "visitors.json")
 
