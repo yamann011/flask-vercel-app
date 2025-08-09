@@ -89,9 +89,8 @@ def login():
         username = request.form.get('username', '').strip()
         password = request.form.get('password', '').strip()
         
-        # Hata ayıklama satırları
-        print(f"Deneme: Kullanıcı adı -> {username}")
-        print(f"Deneme: Şifre -> {password}")
+        # Hata ayıklama: Girilen bilgileri yazdır
+        print(f"Login Attempt: Username='{username}', Password='{password}'")
         
         if not username or not password:
             error = 'Kullanıcı adı ve şifre boş bırakılamaz!'
@@ -99,26 +98,20 @@ def login():
             users = load_users()
             password_hash = hashlib.md5(password.encode()).hexdigest()
             
-            # Hata ayıklama: Girilen şifrenin MD5 hash'i
-            print(f"Girilen şifrenin MD5 hash'i: {password_hash}")
-            
             for user in users:
-                # Hata ayıklama: Veritabanındaki kullanıcı bilgileri
-                print(f"Veritabanı: Kullanıcı adı -> {user['username']}")
-                print(f"Veritabanı: Şifre (hash) -> {user['password']}")
-                
                 if user['username'] == username and user['password'] == password_hash:
                     session['user_id'] = user['id']
                     session['username'] = user['username']
                     session['full_name'] = f"{user['first_name']} {user['last_name']}"
                     session['is_admin'] = user['is_admin']
                     
-                    print("Giriş BAŞARILI!")
+                    # Oturum ayarlandıktan sonra log yazdır
+                    print(f"Login SUCCESS. Session user_id is now: {session.get('user_id')}")
                     
                     return redirect(url_for('dashboard'))
             
             error = 'Kullanıcı adı veya şifre hatalı!'
-            print("Giriş BAŞARISIZ!")
+            print("Login FAILED. Username or password incorrect.")
     
     return render_template('login.html', error=error)
 
@@ -131,9 +124,12 @@ def logout():
 @app.route('/dashboard')
 def dashboard():
     """Ana panel"""
+    # Hata ayıklama: Dashboard'a erişilmeye çalışıldığında oturumu kontrol et
     if 'user_id' not in session:
+        print("Dashboard'a erişim reddedildi. Oturum bulunamadı.")
         return redirect(url_for('login'))
     
+    print(f"Dashboard'a erişim başarılı. Oturumdaki user_id: {session.get('user_id')}")
     return render_template('dashboard.html')
 
 @app.route('/user_management')
