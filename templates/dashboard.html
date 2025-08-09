@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+
+{% block title %}Ana Panel - Ziyaretçi Takip Sistemi{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 id="dailyCount">0</h4>
+                            <p class="mb-0">Günlük</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-calendar-day fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 id="monthlyCount">0</h4>
+                            <p class="mb-0">Aylık</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-calendar-alt fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 id="totalCount">0</h4>
+                            <p class="mb-0">Toplam</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-users fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 id="activeCount">0</h4>
+                            <p class="mb-0">Aktif</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-user-clock fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-2">
+                        <button class="btn btn-primary" onclick="showAddModal()">
+                            <i class="fas fa-plus"></i> Ziyaretçi Ekle
+                        </button>
+                        <button class="btn btn-info" onclick="refreshData()">
+                            <i class="fas fa-sync"></i> Yenile
+                        </button>
+                        <button class="btn btn-success" onclick="exportData()">
+                            <i class="fas fa-file-excel"></i> Excel İndir
+                        </button>
+                        <div class="ms-auto">
+                            <input type="text" class="form-control" id="searchInput" 
+                                   placeholder="İsim, soyisim veya plaka ile ara..." style="width: 300px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Visitors Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-list"></i> Ziyaretçi Listesi</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>İsim</th>
+                                    <th>Soyisim</th>
+                                    <th>Şirket</th>
+                                    <th>Plaka</th>
+                                    <th>Tür</th>
+                                    <th>Giriş</th>
+                                    <th>Çıkış</th>
+                                    <th>Kaydeden</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody id="visitorsTable">
+                                <tr>
+                                    <td colspan="10" class="text-center">
+                                        <i class="fas fa-spinner fa-spin"></i> Yükleniyor...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal fade" id="visitorModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Ziyaretçi Ekle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="visitorForm">
+                <div class="modal-body">
+                    <input type="hidden" id="visitorId" name="id">
+                    <input type="hidden" id="formAction" name="action" value="add">
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="firstName" class="form-label">İsim *</label>
+                                <input type="text" class="form-control" id="firstName" name="firstName" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="lastName" class="form-label">Soyisim *</label>
+                                <input type="text" class="form-control" id="lastName" name="lastName" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="company" class="form-label">Şirket</label>
+                                <input type="text" class="form-control" id="company" name="company">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="plate" class="form-label">Plaka</label>
+                                <input type="text" class="form-control" id="plate" name="plate">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="visitorType" class="form-label">Ziyaretçi Türü</label>
+                                <select class="form-select" id="visitorType" name="visitorType">
+                                    <option value="misafir">Misafir</option>
+                                    <option value="personel">Personel</option>
+                                    <option value="tedarikci">Tedarikçi</option>
+                                    <option value="kurier">Kurier</option>
+                                    <option value="diger">Diğer</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="entryDate" class="form-label">Tarih *</label>
+                                <input type="date" class="form-control" id="entryDate" name="entryDate" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="entryTime" class="form-label">Giriş Saati *</label>
+                                <input type="time" class="form-control" id="entryTime" name="entryTime" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="exitTime" class="form-label">Çıkış Saati</label>
+                                <input type="time" class="form-control" id="exitTime" name="exitTime">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary" id="saveBtn">
+                        <i class="fas fa-save"></i> Kaydet
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Exit Modal -->
+<div class="modal fade" id="exitModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Çıkış Kaydet</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="exitForm">
+                <div class="modal-body">
+                    <input type="hidden" id="exitVisitorId" name="id">
+                    <input type="hidden" name="action" value="exit">
+                    
+                    <div class="mb-3">
+                        <label for="exitTimeInput" class="form-label">Çıkış Saati *</label>
+                        <input type="time" class="form-control" id="exitTimeInput" name="exit_time" required>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong id="exitVisitorName"></strong> için çıkış saati kaydetmek üzeresiniz.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-sign-out-alt"></i> Çıkış Kaydet
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}
