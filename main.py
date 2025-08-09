@@ -5,7 +5,8 @@ from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, make_response
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("SESSION_SECRET", "ziyaretci-takip-sistemi-secret-key")
+# Oturum sorununu çözmek için SECRET_KEY doğrudan kod içine yazıldı
+app.secret_key = "ziyaretci-takip-sistemi-secret-key"
 
 # Vercel'in yazma izni olan tek dizin: /tmp
 DATA_DIR = "/tmp/data"
